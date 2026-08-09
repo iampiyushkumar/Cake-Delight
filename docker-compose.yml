@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: cake-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:alpine
+    container_name: cake-redis
+    ports:
+      - "6379:6379"
+
+  catalog-service:
+    build: ./catalog-service
+    container_name: catalog-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/catalogdb
+    depends_on:
+      - mongo
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongo:27017/orderdb
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mongo
+      - redis
+
+  rating-service:
+    build: ./rating-service
+    container_name: rating-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongo:27017/ratingdb
+    depends_on:
+      - mongo
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - MONGODB_URI=mongodb://mongo:27017/notificationdb
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mongo
+      - redis
+
+  gateway:
+    build: ./gateway
+    container_name: cake-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - CATALOG_SERVICE_URL=http://catalog-service:3001
+      - ORDER_SERVICE_URL=http://order-service:3002
+      - RATING_SERVICE_URL=http://rating-service:3003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+    depends_on:
+      - catalog-service
+      - order-service
+      - rating-service
+      - notification-service
+
+volumes:
+  mongo_data:
