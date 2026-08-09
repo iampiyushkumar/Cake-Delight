@@ -28,7 +28,7 @@ const createCake = async (req, res, next) => {
     try {
         const cakeData = req.body;
         const newCake = await cakeService.createCake(cakeData); 
-
+      console.log("Request in cake creation controller", req.body);
         return res.status(201).json({
             success: true,
             data: newCake,

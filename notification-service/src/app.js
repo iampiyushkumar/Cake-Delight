@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/notifications", notificationRoutes);
+app.use("/", notificationRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

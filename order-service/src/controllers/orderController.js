@@ -32,7 +32,7 @@ exports.addToBasket = async (req, res) => {
     if (!basket) {
       basket = new Basket({ userId, items: [] });
     }
-
+   console.log('Adding to basket:', { userId, productId, name, price, quantity });
     const existingIndex = basket.items.findIndex((item) => item.productId === productId);
     if (existingIndex > -1) {
       basket.items[existingIndex].quantity += quantity;
@@ -106,6 +106,7 @@ exports.checkout = async (req, res) => {
     if (!basket || basket.items.length === 0) {
       return res.status(400).json({ message: 'Basket is empty' });
     }
+    console.log('Basket fetched for checkout:', basket);
 
     // 2. Save Order to Database
     const newOrder = await Order.create({

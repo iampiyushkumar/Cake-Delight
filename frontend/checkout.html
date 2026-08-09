@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cake Delight | Checkout</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="./index.html" aria-label="Cake Delight home">
+        <span class="brand-mark">CD</span>
+        <span class="brand-text">Cake Delight</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="./index.html" class="nav-link">Home</a>
+        <a href="./basket.html" class="nav-link">Basket</a>
+        <a href="./notifications.html" class="nav-link">Notifications</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Checkout</p>
+        <h2>Confirm Your Order</h2>
+      </div>
+      <p id="checkoutStatus" class="muted-text">Ready to place your order.</p>
+    </div>
+
+    <div class="checkout-grid">
+      <section class="checkout-card">
+        <h3>Shipping Details</h3>
+        <form id="checkoutForm" class="checkout-form">
+          <label class="field">
+            <span>User Id</span>
+            <input id="checkoutUserId" type="text" readonly />
+          </label>
+
+          <label class="field">
+            <span>Shipping Address</span>
+            <textarea id="shippingAddress" class="textarea-field" placeholder="Enter full shipping address" required></textarea>
+          </label>
+
+          <button type="submit" class="btn btn-primary">Confirm Order</button>
+        </form>
+
+        <div id="checkoutSuccess" class="checkout-success" hidden>Order Created Successfully</div>
+      </section>
+
+      <aside class="checkout-card">
+        <h3>Order Summary</h3>
+        <div id="checkoutOrderSummary" class="notification-grid">
+          <div class="empty-state">No order placed yet.</div>
+        </div>
+      </aside>
+    </div>
+
+    <section id="ratingSection" class="checkout-card rating-card" hidden>
+      <h3>Rate Your Purchase</h3>
+      <div class="rating-grid">
+        <label class="field">
+          <span>Cake</span>
+          <select id="ratingCakeSelect" class="cake-select"></select>
+        </label>
+
+        <div>
+          <span class="field"><span>Rating</span></span>
+          <div id="ratingStars" class="stars" aria-label="Rating stars"></div>
+        </div>
+
+        <label class="field">
+          <span>Comment</span>
+          <textarea id="ratingComment" class="textarea-field" placeholder="Leave a short comment"></textarea>
+        </label>
+
+        <div class="summary-row total">
+          <span>Average Rating</span>
+          <strong id="ratingAverage">-</strong>
+        </div>
+
+        <button type="button" id="ratingSubmit" class="btn btn-primary">Submit Rating</button>
+        <p id="ratingMessage" class="muted-text"></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/checkout.js"></script>
+  <script src="./js/rating.js"></script>
+</body>
+</html>

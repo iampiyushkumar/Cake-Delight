@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/ratings", ratingRoutes);
+app.use("/", ratingRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

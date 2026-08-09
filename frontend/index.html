@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cake Delight</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="./index.html" aria-label="Cake Delight home">
+        <span class="brand-mark">CD</span>
+        <span class="brand-text">Cake Delight</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="./index.html" class="nav-link active">Home</a>
+        <a href="./basket.html" class="nav-link">Basket</a>
+        <a href="./notifications.html" class="nav-link">Notifications</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Cloud Native Microservices Engineering Capstone</p>
+          <h1>Cake Delight</h1>
+          <p class="hero-copy">
+            Browse cakes, place orders, submit ratings, and track notifications through the API gateway.
+          </p>
+          <div class="hero-actions">
+            <a href="#cakes" class="btn btn-primary">Browse Cakes</a>
+            <a href="./basket.html" class="btn btn-secondary">View Basket</a>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <h2>Quick Start</h2>
+          <ul class="quick-list">
+            <li>Search and filter cakes</li>
+            <li>Add items to your basket</li>
+            <li>Checkout and rate your order</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="container section" id="cakes">
+      <div class="section-header">
+        <div>
+          <p class="section-label">Catalog</p>
+          <h2>Find Your Cake</h2>
+        </div>
+        <p id="catalogStatus" class="muted-text">Loading cakes...</p>
+      </div>
+
+      <section class="admin-card">
+        <div class="section-header compact">
+          <div>
+            <p class="section-label">Catalog Admin</p>
+            <h3>Create Cake</h3>
+          </div>
+          <p id="createCakeStatus" class="muted-text">Add a new cake to the catalog.</p>
+        </div>
+
+        <form id="createCakeForm" class="create-form" autocomplete="off">
+          <label class="field">
+            <span>Name</span>
+            <input id="cakeName" type="text" minlength="2" maxlength="100" placeholder="Cake name" required />
+          </label>
+
+          <label class="field">
+            <span>Description</span>
+            <textarea id="cakeDescription" class="textarea-field" maxlength="1000" placeholder="Short description" required></textarea>
+          </label>
+
+          <label class="field">
+            <span>Category</span>
+            <select id="cakeCategory" required>
+              <option value="">Select category</option>
+              <option value="Birthday">Birthday</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Anniversary">Anniversary</option>
+              <option value="Chocolate">Chocolate</option>
+              <option value="Eggless">Eggless</option>
+              <option value="Cupcake">Cupcake</option>
+              <option value="Fruit">Fruit</option>
+              <option value="Designer">Designer</option>
+              <option value="Kids">Kids</option>
+              <option value="Premium">Premium</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Price</span>
+            <input id="cakePrice" type="number" min="0" step="1" placeholder="Price" required />
+          </label>
+
+          <label class="field">
+            <span>Image URL</span>
+            <input id="cakeImage" type="url" placeholder="https://..." required />
+          </label>
+
+          <label class="field field-inline">
+            <span>Availability</span>
+            <div class="checkbox-row">
+              <input id="cakeAvailability" type="checkbox" checked />
+              <label for="cakeAvailability">Available</label>
+            </div>
+          </label>
+
+          <div class="field field-action create-action">
+            <span>&nbsp;</span>
+            <button type="submit" class="btn btn-primary">Create Cake</button>
+          </div>
+        </form>
+      </section>
+
+      <form id="filterForm" class="filters" autocomplete="off">
+        <label class="field">
+          <span>Search</span>
+          <input id="searchInput" type="search" placeholder="Search by cake name" />
+        </label>
+
+        <label class="field">
+          <span>Category</span>
+          <select id="categorySelect">
+            <option value="">All Categories</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Anniversary">Anniversary</option>
+            <option value="Chocolate">Chocolate</option>
+            <option value="Eggless">Eggless</option>
+            <option value="Cupcake">Cupcake</option>
+            <option value="Fruit">Fruit</option>
+            <option value="Designer">Designer</option>
+            <option value="Kids">Kids</option>
+            <option value="Premium">Premium</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Min Price</span>
+          <input id="minPriceInput" type="number" min="0" step="1" placeholder="0" />
+        </label>
+
+        <label class="field">
+          <span>Max Price</span>
+          <input id="maxPriceInput" type="number" min="0" step="1" placeholder="5000" />
+        </label>
+
+        <div class="field field-action">
+          <span>&nbsp;</span>
+          <button type="submit" class="btn btn-primary">Apply</button>
+        </div>
+      </form>
+
+      <div id="cakeGrid" class="cake-grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div id="cakeModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="cakeModalTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close details">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <template id="cakeCardTemplate">
+    <article class="cake-card">
+      <img class="cake-image" alt="" />
+      <div class="cake-content">
+        <div class="cake-topline">
+          <h3 class="cake-name"></h3>
+          <span class="cake-price"></span>
+        </div>
+        <p class="cake-category muted-text"></p>
+        <p class="cake-availability"></p>
+        <p class="cake-rating muted-text"></p>
+        <div class="card-actions">
+          <button type="button" class="btn btn-secondary view-details-btn">View Details</button>
+          <button type="button" class="btn btn-primary add-basket-btn">Add To Basket</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/catalog.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cake Delight | Basket</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="./index.html" aria-label="Cake Delight home">
+        <span class="brand-mark">CD</span>
+        <span class="brand-text">Cake Delight</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="./index.html" class="nav-link">Home</a>
+        <a href="./basket.html" class="nav-link active">Basket</a>
+        <a href="./notifications.html" class="nav-link">Notifications</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Orders</p>
+        <h2>Your Basket</h2>
+      </div>
+      <p id="basketStatus" class="muted-text">Loading basket...</p>
+    </div>
+
+    <section class="basket-layout">
+      <div class="basket-panel">
+        <div id="basketItems" class="basket-items" aria-live="polite"></div>
+      </div>
+
+      <aside class="basket-summary">
+        <h3>Summary</h3>
+        <div class="summary-row">
+          <span>User ID</span>
+          <strong id="basketUserId">-</strong>
+        </div>
+        <div class="summary-row">
+          <span>Total Items</span>
+          <strong id="basketItemCount">0</strong>
+        </div>
+        <div class="summary-row total">
+          <span>Total Price</span>
+          <strong id="basketTotalPrice">₹0</strong>
+        </div>
+
+        <a href="./checkout.html" class="btn btn-primary basket-checkout-link">Checkout</a>
+      </aside>
+    </section>
+  </main>
+
+  <template id="basketItemTemplate">
+    <article class="basket-item">
+      <div class="basket-item-main">
+        <div>
+          <h3 class="basket-item-name"></h3>
+          <p class="muted-text basket-item-price"></p>
+        </div>
+
+        <div class="basket-quantity">
+          <button type="button" class="btn btn-secondary quantity-down">-</button>
+          <span class="basket-quantity-value"></span>
+          <button type="button" class="btn btn-secondary quantity-up">+</button>
+        </div>
+      </div>
+
+      <div class="basket-item-footer">
+        <span class="basket-item-subtotal"></span>
+        <button type="button" class="btn btn-secondary remove-item">Remove</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/basket.js"></script>
+</body>
+</html>
