@@ -90,6 +90,17 @@
     }, 2200);
   }
 
+  function isCakeAvailable(cake) {
+    return Boolean(cake && cake.availability);
+  }
+
+  function showOutOfStockFeedback(cake) {
+    const itemLabel = cake?.name || "Item";
+    const message = `${itemLabel} is out of stock.`;
+    setStatus(message, true);
+    showToast(message, "error");
+  }
+
   async function loadCakes(filters = {}) {
     const { cakeGrid } = getElements();
     setStatus("Loading cakes...");
@@ -160,6 +171,8 @@
       CakeDelightUI.setText(availability, CakeDelightUI.availabilityLabel(cake.availability));
       availability.classList.toggle("unavailable", !cake.availability);
       CakeDelightUI.setText(rating, "Average Rating: Loading...");
+      addBasketBtn.title = cake.availability ? "Add to basket" : "Item is out of stock";
+      addBasketBtn.classList.toggle("is-unavailable", !cake.availability);
 
       viewDetailsBtn.addEventListener("click", () => openDetails(cake));
       addBasketBtn.addEventListener("click", () => addCakeToBasket(cake));
@@ -204,8 +217,6 @@
     const detailAverageRating = modalContent.querySelector("#detailAverageRating");
     const detailAddToBasket = modalContent.querySelector("#detailAddToBasket");
 
-    detailAddToBasket.addEventListener("click", () => addCakeToBasket(cake, 1, "details"));
-
     try {
       const freshCake = await CakeDelightAPI.getCakeById(cake._id);
       const activeCake = freshCake?.data || freshCake;
@@ -217,8 +228,11 @@
       modalContent.querySelector("#detailCategory").textContent = activeCake.category || cake.category || "N/A";
       modalContent.querySelector("#detailDescription").textContent = activeCake.description || cake.description || "No description available.";
       modalContent.querySelector("#detailPrice").textContent = CakeDelightUI.formatCurrency(activeCake.price || cake.price);
-      modalContent.querySelector("#detailAvailability").textContent = CakeDelightUI.availabilityLabel(activeCake.availability ?? cake.availability);
+      const isAvailable = activeCake.availability ?? cake.availability;
+      modalContent.querySelector("#detailAvailability").textContent = CakeDelightUI.availabilityLabel(isAvailable);
       modalContent.querySelector("#detailCakeId").textContent = activeCake._id || cake._id || "N/A";
+      detailAddToBasket.title = isAvailable ? "Add to basket" : "Item is out of stock";
+      detailAddToBasket.classList.toggle("is-unavailable", !isAvailable);
 
       const ratingResponse = await CakeDelightAPI.getAverageRating(activeCake._id || cake._id);
       const average = Number(ratingResponse?.averageRating || 0);
@@ -232,6 +246,8 @@
     } catch (error) {
       detailAverageRating.textContent = "Unavailable";
     }
+
+    detailAddToBasket.addEventListener("click", () => addCakeToBasket(state.activeCake || cake, 1, "details"));
   }
 
   async function handleCreateCake(event) {
@@ -275,6 +291,17 @@
   }
 
   async function addCakeToBasket(cake, quantity = 1, source = "card") {
+    if (!cake || !cake._id) {
+      setStatus("Unable to add item to basket.", true);
+      showToast("Unable to add item to basket.", "error");
+      return;
+    }
+
+    if (!isCakeAvailable(cake)) {
+      showOutOfStockFeedback(cake);
+      return;
+    }
+
     const qty = Math.max(1, Number(quantity) || 1);
     const userId = getUserId();
     const itemLabel = qty > 1 ? `${qty} ${cake.name} items` : `${cake.name}`;

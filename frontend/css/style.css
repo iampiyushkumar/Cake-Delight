@@ -318,6 +318,15 @@ select {
   transform: translateY(-1px);
 }
 
+.btn.is-unavailable {
+  opacity: 0.72;
+  box-shadow: none;
+}
+
+.btn.is-unavailable:hover {
+  transform: none;
+}
+
 .btn-primary {
   color: #fff;
   background: linear-gradient(135deg, var(--primary), #4f83ff);
