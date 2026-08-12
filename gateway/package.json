@@ -1,7 +1,7 @@
 {
   "name": "gateway",
   "version": "1.0.0",
- "description": "API Gateway for Cake Delight Microservices",
+  "description": "API Gateway for Cake Delight Microservices",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -15,6 +15,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "http-proxy-middleware": "^4.2.0"
+    "http-proxy-middleware": "^4.2.0",
+    "prom-client": "^15.1.3"
   }
 }

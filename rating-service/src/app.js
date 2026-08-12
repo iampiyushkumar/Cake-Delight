@@ -1,11 +1,46 @@
 const express = require("express");
 const cors = require("cors");
 const ratingRoutes = require("./routes/ratingRoutes");
+const client = require('prom-client');
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({ register: client.register });
+const httpRequestDurationMicroseconds = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5]
+});
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => { 
+  const start = Date.now(); 
+  res.on('finish', () => {
+    const duration = (Date.now() - start) / 1000;
+    const route = req.route ? req.route.path : req.path;
+    httpRequestDurationMicroseconds
+      .labels(req.method, route, res.statusCode.toString())
+      .observe(duration);
+  });
+  next();
+});
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+  });
+});
 
 // Routes
 app.use("/", ratingRoutes);

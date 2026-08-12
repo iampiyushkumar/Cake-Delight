@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: cake-delight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3004"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: notification-service
+          image: notification-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3004
+          env:
+            - name: PORT
+              value: "3004"
+            - name: NODE_ENV
+              value: "development"
+            - name: MONGODB_URI
+              value: "mongodb://mongo:27017/notificationdb"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"

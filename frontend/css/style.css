@@ -414,6 +414,42 @@ select {
   color: var(--muted);
 }
 
+.toast-container {
+  position: fixed;
+  top: 84px;
+  right: 20px;
+  z-index: 80;
+  display: grid;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  min-width: 240px;
+  max-width: min(320px, calc(100vw - 40px));
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  animation: toast-enter 0.18s ease-out;
+}
+
+.toast-success {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.toast-hide {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -422,6 +458,17 @@ select {
   justify-content: center;
   padding: 20px;
   z-index: 50;
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal.open {

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rating-service
+  namespace: cake-delight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rating-service
+  template:
+    metadata:
+      labels:
+        app: rating-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3003"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: rating-service
+          image: rating-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3003
+          env:
+            - name: PORT
+              value: "3003"
+            - name: NODE_ENV
+              value: "development"
+            - name: MONGODB_URI
+              value: "mongodb://mongo:27017/ratingdb"

@@ -4,6 +4,8 @@
     activeCake: null,
   };
 
+  let toastTimer = null;
+
   function getUserId() {
     let userId = localStorage.getItem("cakeDelightUserId");
     if (!userId) {
@@ -56,6 +58,38 @@
     cakeGrid.innerHTML = `<div class="${className}">${CakeDelightUI.escapeHtml(message)}</div>`;
   }
 
+  function ensureToastContainer() {
+    let toastContainer = document.getElementById("toastContainer");
+    if (toastContainer) return toastContainer;
+
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toastContainer";
+    toastContainer.className = "toast-container";
+    toastContainer.setAttribute("aria-live", "polite");
+    toastContainer.setAttribute("aria-atomic", "true");
+    document.body.appendChild(toastContainer);
+    return toastContainer;
+  }
+
+  function showToast(message, type = "success") {
+    const toastContainer = ensureToastContainer();
+    if (!toastContainer) return;
+
+    toastContainer.innerHTML = "";
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      toast.classList.add("toast-hide");
+      window.setTimeout(() => {
+        if (toast.isConnected) toast.remove();
+      }, 180);
+    }, 2200);
+  }
+
   async function loadCakes(filters = {}) {
     const { cakeGrid } = getElements();
     setStatus("Loading cakes...");
@@ -77,6 +111,25 @@
     } catch (error) {
       renderPlaceholder(error.message || "Unable to load cakes.", "error-state");
       setStatus(error.message || "Unable to load cakes.", true);
+    }
+  }
+
+  async function updateCakeRating(cake, ratingElement) {
+    if (!cake || !cake._id || !ratingElement) return;
+
+    try {
+      const ratingResponse = await CakeDelightAPI.getAverageRating(cake._id);
+      const average = Number(ratingResponse?.averageRating || 0);
+      const totalRatings = Number(ratingResponse?.totalRatings || 0);
+
+      if (!ratingElement.isConnected) return;
+
+      ratingElement.textContent = totalRatings
+        ? `Average Rating: ${CakeDelightUI.ratingLabel(average)} (${totalRatings})`
+        : "Average Rating: No ratings yet";
+    } catch (error) {
+      if (!ratingElement.isConnected) return;
+      ratingElement.textContent = "Average Rating: Unavailable";
     }
   }
 
@@ -106,12 +159,13 @@
       CakeDelightUI.setText(category, `Category: ${cake.category || "N/A"}`);
       CakeDelightUI.setText(availability, CakeDelightUI.availabilityLabel(cake.availability));
       availability.classList.toggle("unavailable", !cake.availability);
-      CakeDelightUI.setText(rating, `Average Rating: ${cake.averageRating ? cake.averageRating.toFixed(1) : "N/A"}`);
+      CakeDelightUI.setText(rating, "Average Rating: Loading...");
 
       viewDetailsBtn.addEventListener("click", () => openDetails(cake));
       addBasketBtn.addEventListener("click", () => addCakeToBasket(cake));
 
       cakeGrid.appendChild(node);
+      updateCakeRating(cake, rating);
 
       if (!cake.availability) {
         card.style.opacity = "0.9";
@@ -137,11 +191,6 @@
             <span><strong>Cake ID:</strong> <span id="detailCakeId">${CakeDelightUI.escapeHtml(cake._id || "N/A")}</span></span>
           </div>
 
-          <label class="field">
-            <span>Quantity</span>
-            <input id="detailQuantity" type="number" min="1" step="1" value="1" />
-          </label>
-
           <div class="detail-actions">
             <button type="button" class="btn btn-primary" id="detailAddToBasket">Add To Basket</button>
             <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
@@ -154,9 +203,8 @@
 
     const detailAverageRating = modalContent.querySelector("#detailAverageRating");
     const detailAddToBasket = modalContent.querySelector("#detailAddToBasket");
-    const detailQuantity = modalContent.querySelector("#detailQuantity");
 
-    detailAddToBasket.addEventListener("click", () => addCakeToBasket(cake, Number(detailQuantity.value || 1)));
+    detailAddToBasket.addEventListener("click", () => addCakeToBasket(cake, 1, "details"));
 
     try {
       const freshCake = await CakeDelightAPI.getCakeById(cake._id);
@@ -226,9 +274,14 @@
     }
   }
 
-  async function addCakeToBasket(cake, quantity = 1) {
+  async function addCakeToBasket(cake, quantity = 1, source = "card") {
     const qty = Math.max(1, Number(quantity) || 1);
     const userId = getUserId();
+    const itemLabel = qty > 1 ? `${qty} ${cake.name} items` : `${cake.name}`;
+    const toastMessage =
+      source === "details"
+        ? `${itemLabel} added to basket from cake details.`
+        : `${itemLabel} added to basket.`;
 
     try {
       await CakeDelightAPI.addToBasket({
@@ -239,9 +292,11 @@
         quantity: qty,
       });
 
-      setStatus(`${cake.name} added to basket.`);
+      setStatus(toastMessage);
+      showToast(toastMessage);
     } catch (error) {
       setStatus(error.message || "Unable to add to basket.", true);
+      showToast(error.message || "Unable to add to basket.", "error");
     }
   }
 
