@@ -36,7 +36,13 @@ app.get('/metrics', async (req, res) => {
   res.end(await client.register.metrics());
 });
 
-// Error handling middleware
+
+// Health check
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", service: "notification-service" });
+});
+app.use("/", notificationRoutes);
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -44,11 +50,5 @@ app.use((err, req, res, next) => {
     message: "Internal Server Error",
   });
 });
-
-// Health check
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", service: "notification-service" });
-});
-app.use("/notifications", notificationRoutes);
 
 module.exports = app;

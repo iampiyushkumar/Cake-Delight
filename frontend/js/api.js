@@ -102,11 +102,11 @@ const CakeDelightAPI = (() => {
   }
 
 function getAllNotifications() {
-  return request("/notifications");
+  return request("/notifications/notifications");
 }
 
 function getNotificationsByUserId(userId) {
-  return request(`/notifications/${encodeURIComponent(userId)}`);
+  return request(`/notifications/notifications/${encodeURIComponent(userId)}`);
 }
 
   return {

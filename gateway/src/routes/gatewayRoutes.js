@@ -42,6 +42,7 @@ const setupGatewayRoutes = (app) => {
     createProxyMiddleware({
       target: notificationUrl,
       changeOrigin: true,
+      pathRewrite: { '^/notifications': '' } 
     })
   );
 };

@@ -127,7 +127,10 @@ Microservices
 cake-delight/
 │
 ├── catalog-service/            # Cake catalog REST API & Mongoose models
-│
+|
+│---Demonstrations Images.   #Contains images of our applications
+|
+|
 ├── order-service/              # Basket management & checkout flow
 │                               # BullMQ producer
 │
@@ -529,7 +532,17 @@ Open separate terminal windows for each service.
 ## API Gateway
 
 ```bash
+# Terminal 1
 kubectl port-forward svc/gateway 8080:8080 -n cake-delight
+```
+```bash
+# Terminal 2 — Prometheus UI (http://localhost:9090)
+kubectl port-forward svc/prometheus 9090:9090 -n cake-delight
+```
+```bash
+
+# Terminal 3 — Grafana Dashboard (http://localhost:3000)
+kubectl port-forward svc/grafana 3000:3000 -n cake-delight
 ```
 
 The API Gateway will be available at:
@@ -590,11 +603,6 @@ The frontend will typically be available on one of the ports displayed by `serve
 http://localhost:3000
 ```
 
-or
-
-```text
-http://localhost:5000
-```
 
 The frontend communicates with the application through the API Gateway.
 
